@@ -1,0 +1,12 @@
+package com.recipesplan.ingredients.services;
+
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+
+import com.recipesplan.ingredients.entities.Ingredient;
+
+@Service
+public interface IngredientService {
+    public List<Ingredient> getAll();
+}
