@@ -3,6 +3,7 @@ package com.recipesplan.ingredients.controllers;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.recipesplan.ingredients.dtos.IngredientDto;
 import com.recipesplan.ingredients.dtos.Meta;
 import com.recipesplan.ingredients.dtos.Response;
 import com.recipesplan.ingredients.entities.Ingredient;
@@ -17,7 +18,9 @@ import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+
 
 
 
@@ -30,7 +33,7 @@ public class IngredientController {
         this.ingredientService = ingredientService;
     }
 
-    @GetMapping("/v1/")
+    @GetMapping("/v1")
     public ResponseEntity<?> getAll() {
         
         Meta meta = new Meta(
@@ -46,10 +49,18 @@ public class IngredientController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @GetMapping("/v1/{id}")
-    public ResponseEntity<?> getMethodName(@PathVariable Long ingredientId) {
-        return new ResponseEntity<>(ingredientService.findById(ingredientId), HttpStatus.OK);
+    @GetMapping("/find/v1/{id}")
+    public ResponseEntity<?> findById(@PathVariable Long ingredientId) {
+        Response<IngredientDto> response = ingredientService.getIngredient(ingredientId);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
+    @PostMapping("/v1")
+    public ResponseEntity<?> postMethodName(@RequestBody IngredientDto dto) {
+        Response<IngredientDto> response = ingredientService.postIngredient(dto);
+        return new ResponseEntity<>(HttpStatus.CREATED);
+    }
+    
     
     
 }

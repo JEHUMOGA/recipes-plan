@@ -6,19 +6,23 @@ import com.recipesplan.ingredients.dtos.IngredientDto;
 import com.recipesplan.ingredients.entities.Ingredient;
 
 @Component
-public class IngredientMapper {
-    private final IngredientDto ingredientDto;
+public final class IngredientMapper {
 
-    IngredientMapper(IngredientDto ingredientDto) {
-        this.ingredientDto = ingredientDto;
-    }
-
-    public IngredientDto toDto(Ingredient ingredient){
+    public static IngredientDto toDto(Ingredient ingredient){
         if(ingredient == null) return null;
         return new IngredientDto(
             ingredient.getId(),
             ingredient.getName(),
             ingredient.getDescription()
         );
+    }
+
+    public static Ingredient toEntity(IngredientDto ingredientDto){
+        if(ingredientDto == null) return null;
+        Ingredient ingredient = new Ingredient();
+        ingredient.setId(ingredientDto.id());
+        ingredient.setName(ingredientDto.name());
+        ingredient.setDescription(ingredientDto.description());
+        return ingredient;
     }
 }

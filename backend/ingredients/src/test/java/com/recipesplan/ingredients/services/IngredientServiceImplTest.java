@@ -13,6 +13,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 
@@ -34,9 +35,6 @@ public class IngredientServiceImplTest {
     @InjectMocks
     private IngredientServiceImpl ingredientServiceImpl;
 
-    @Mock
-    private IngredientMapper ingredientMapper;
-
     @Test
     public void getList(){
         Ingredient ingredient = getIngredient();
@@ -54,11 +52,21 @@ public class IngredientServiceImplTest {
         //Response<IngredientDto> response = getResponseSuccess(ingredient);
         when(ingredientRepository.findById(ingredient.getId())).thenReturn(Optional.of(ingredient));
 
-        Response<IngredientDto> response = ingredientServiceImpl.findById(ingredient.getId());
+        Response<IngredientDto> response = ingredientServiceImpl.getIngredient(ingredient.getId());
 
         IngredientDto ingredientDto = response.getData();
         assertTrue(ingredientDto.id() == ingredient.getId());
 
+    }
+
+    @Test
+    public void shouldSaveIngredient_WhenItsGiven(){
+        Ingredient ingredient = getIngredient();
+        when(ingredientRepository.save(ingredient)).thenReturn(ingredient);
+
+        Response<IngredientDto> response = ingredientServiceImpl.postIngredient(IngredientMapper.toDto(ingredient));
+
+        assertTrue(response.getMeta().getStatusCode().value() == HttpStatus.CREATED.value());
     }
 
     private Ingredient getIngredient(){
@@ -78,7 +86,7 @@ public class IngredientServiceImplTest {
         );
 
         Response<IngredientDto> response = new Response<IngredientDto>(
-            ingredientMapper.toDto(ingredient), 
+            IngredientMapper.toDto(ingredient), 
             meta);
         return response;
     }

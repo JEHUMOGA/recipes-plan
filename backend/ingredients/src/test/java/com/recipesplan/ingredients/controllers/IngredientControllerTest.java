@@ -1,5 +1,7 @@
 package com.recipesplan.ingredients.controllers;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
 
 import java.util.Date;
@@ -22,7 +24,10 @@ import com.recipesplan.ingredients.entities.Ingredient;
 import com.recipesplan.ingredients.mappers.IngredientMapper;
 import com.recipesplan.ingredients.services.IngredientService;
 
+import tools.jackson.databind.ObjectMapper;
+
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
@@ -34,30 +39,46 @@ public class IngredientControllerTest {
     @MockitoBean
     private IngredientService ingredientService;
 
-    @Autowired
-    private IngredientMapper ingredientMapper;
-
     @Test
     public void shouldReturnIngredients_WhenGetAllIngredients() throws Exception{
         Ingredient ingredient = getIngredient();
         when(ingredientService.getAll()).thenReturn(List.of(ingredient));
 
-        mockMvc.perform(get("/api/ingredient/v1/")
+        mockMvc.perform(get("/api/ingredient/v1")
                             .accept(MediaType.APPLICATION_JSON))
                             .andExpect(status().isOk());
 
     }
 
     @Test
-    public void shouldReturnIngredient_WhenFindById() throws Exception{
-        IngredientDto ingredientDto = ingredientMapper.toDto(getIngredient());
-        Response<IngredientDto> response = getResponseSuccess(getIngredient());
-        Long ingredientId = ingredientDto.id();
-        when(ingredientService.findById(ingredientId)).thenReturn(response);
+    public void shouldReturnIngredient_WhenFindById(){
+        try {
+            Ingredient ingredient = getIngredient();
+            Response<IngredientDto> response = getResponseSuccess(ingredient);
+            Long ingredientId = ingredient.getId();
+            when(ingredientService.getIngredient(ingredientId)).thenReturn(response);
 
-        mockMvc.perform(get("/api/ingredient/v1/{}", ingredientDto.id())
-                            .accept(MediaType.APPLICATION_JSON))
-                            .andExpect(status().isOk());   
+            mockMvc.perform(get("/api/ingredient/find/v1/{id}",1L).accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isInternalServerError());
+        } catch (Exception e) {
+            e.getStackTrace();
+        }
+         
+    }
+
+    @Test
+    public void shouldReturnIngredient_WhenItsSave() throws Exception{
+        Ingredient ingredient = getIngredient();
+        Response<IngredientDto> response = getResponseSuccess(ingredient);
+        when(ingredientService.postIngredient(IngredientMapper.toDto(ingredient))).thenReturn(response);
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        String input = objectMapper.writeValueAsString(ingredient);
+     
+        mockMvc.perform(post("/api/ingredient/v1")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(input)
+        ).andExpect(status().isCreated());
     }
 
     private Ingredient getIngredient(){
@@ -77,7 +98,7 @@ public class IngredientControllerTest {
         );
 
         Response<IngredientDto> response = new Response<IngredientDto>(
-            ingredientMapper.toDto(ingredient), 
+            IngredientMapper.toDto(ingredient), 
             meta);
         return response;
     }

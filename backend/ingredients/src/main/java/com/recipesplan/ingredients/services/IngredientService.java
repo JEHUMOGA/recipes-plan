@@ -11,5 +11,6 @@ import com.recipesplan.ingredients.entities.Ingredient;
 @Service
 public interface IngredientService {
     public List<Ingredient> getAll();
-    public Response<IngredientDto> findById(Long ingredientId);
+    public Response<IngredientDto> getIngredient(Long ingredientId);
+    public Response<IngredientDto> postIngredient(IngredientDto ingredientDto);
 }
