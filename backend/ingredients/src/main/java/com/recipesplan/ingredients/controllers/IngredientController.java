@@ -3,16 +3,25 @@ package com.recipesplan.ingredients.controllers;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.recipesplan.ingredients.dtos.IngredientDto;
 import com.recipesplan.ingredients.dtos.Meta;
 import com.recipesplan.ingredients.dtos.Response;
 import com.recipesplan.ingredients.entities.Ingredient;
 import com.recipesplan.ingredients.services.IngredientService;
 
+import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+
+
 
 
 @RestController
@@ -24,12 +33,34 @@ public class IngredientController {
         this.ingredientService = ingredientService;
     }
 
-    @GetMapping("/v1/")
+    @GetMapping("/v1")
     public ResponseEntity<?> getAll() {
-        Response<List<Ingredient>> response = new Response<>();
-        response.setData(ingredientService.getAll());
-        response.setMeta(new Meta());
+        
+        Meta meta = new Meta(
+            UUID.randomUUID(),
+            HttpStatus.OK,
+            HttpStatusCode.valueOf(HttpStatus.OK.value()), 
+            new Date()
+        );
+
+        Response<List<Ingredient>> response = new Response<>(
+            ingredientService.getAll(),
+            meta);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
+    @GetMapping("/find/v1/{id}")
+    public ResponseEntity<?> findById(@PathVariable Long ingredientId) {
+        Response<IngredientDto> response = ingredientService.getIngredient(ingredientId);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @PostMapping("/v1")
+    public ResponseEntity<?> postMethodName(@RequestBody IngredientDto dto) {
+        Response<IngredientDto> response = ingredientService.postIngredient(dto);
+        return new ResponseEntity<>(HttpStatus.CREATED);
+    }
+    
+    
     
 }

@@ -1,9 +1,7 @@
 package com.recipesplan.ingredients.dtos;
 
-import lombok.Data;
-
-@Data
-public class IngredientDto {
-    private String name;
-    private String description;
-}
+public record IngredientDto(
+    Long id,
+    String name,
+    String description
+) {}
