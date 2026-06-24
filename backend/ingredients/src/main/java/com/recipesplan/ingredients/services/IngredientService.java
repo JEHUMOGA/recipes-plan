@@ -13,4 +13,5 @@ public interface IngredientService {
     public List<Ingredient> getAll();
     public Response<IngredientDto> getIngredient(Long ingredientId);
     public Response<IngredientDto> postIngredient(IngredientDto ingredientDto);
+    public Response<IngredientDto> updateIngredient(Long ingredientId, IngredientDto ingredientDto);
 }

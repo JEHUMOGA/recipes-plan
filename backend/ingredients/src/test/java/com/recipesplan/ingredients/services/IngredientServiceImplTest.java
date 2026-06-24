@@ -69,6 +69,20 @@ public class IngredientServiceImplTest {
         assertTrue(response.getMeta().getStatusCode().value() == HttpStatus.CREATED.value());
     }
 
+    @Test
+    public void shouldUpdateIngredient_WhenItsGiven(){
+        Ingredient ingredient1 = getIngredient();
+        Ingredient ingredient2 = getIngredient();
+        ingredient2.setName("Test Update");
+        when(ingredientRepository.findById(ingredient1.getId())).thenReturn(Optional.of(ingredient1));
+        when(ingredientRepository.save(ingredient2)).thenReturn(ingredient2);
+
+        Response<IngredientDto> response = ingredientServiceImpl.updateIngredient(ingredient2.getId(), IngredientMapper.toDto(ingredient2));
+
+        assertTrue(response.getData().name().equalsIgnoreCase(ingredient2.getName()));
+
+    }
+
     private Ingredient getIngredient(){
         Ingredient ingredient = new Ingredient();
         ingredient.setId(1L);
