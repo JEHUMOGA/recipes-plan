@@ -51,6 +51,20 @@ public class IngredientServiceImpl implements IngredientService{
         return getResponseIsCreated();
     }
 
+    @Override
+    public Response<IngredientDto> updateIngredient(Long ingredientId, IngredientDto ingredientDto) {
+        Optional<Ingredient> optional = ingredientRepository.findById(ingredientId);
+        if(!optional.isPresent())
+            return getResponseNotFound();
+
+        Ingredient ingredient = optional.get();
+        ingredient.setName(ingredientDto.name());
+        ingredient.setDescription(ingredientDto.description());
+
+        Ingredient save = ingredientRepository.save(ingredient);
+        return getResponseSuccess(save);
+    }
+
     private Response<IngredientDto> getResponseSuccess(Ingredient ingredient){
         Meta meta = new Meta(
             UUID.randomUUID(), 

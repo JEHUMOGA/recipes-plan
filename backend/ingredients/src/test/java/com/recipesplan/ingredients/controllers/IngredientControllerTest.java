@@ -28,6 +28,7 @@ import tools.jackson.databind.ObjectMapper;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
@@ -58,8 +59,8 @@ public class IngredientControllerTest {
             Long ingredientId = ingredient.getId();
             when(ingredientService.getIngredient(ingredientId)).thenReturn(response);
 
-            mockMvc.perform(get("/api/ingredient/find/v1/{id}",1L).accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isInternalServerError());
+            mockMvc.perform(get("/api/ingredient/find/v1/{ingredientId}",1L).accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
         } catch (Exception e) {
             e.getStackTrace();
         }
@@ -79,6 +80,21 @@ public class IngredientControllerTest {
             .contentType(MediaType.APPLICATION_JSON)
             .content(input)
         ).andExpect(status().isCreated());
+    }
+
+    @Test
+    public void shouldUpdateIngredient_WhenItsPut() throws Exception{
+        Ingredient ingredient = getIngredient();
+        Response<IngredientDto> response = getResponseSuccess(ingredient);
+
+        when(ingredientService.updateIngredient(ingredient.getId(),IngredientMapper.toDto(ingredient))).thenReturn(response);
+        ObjectMapper objectMapper = new ObjectMapper();
+        String input = objectMapper.writeValueAsString(ingredient);
+
+        mockMvc.perform(put("/api/ingredient/v1/{ingredientId}", ingredient.getId())
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(input)
+        ).andExpect(status().isOk());
     }
 
     private Ingredient getIngredient(){
