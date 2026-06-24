@@ -65,6 +65,18 @@ public class IngredientServiceImpl implements IngredientService{
         return getResponseSuccess(save);
     }
 
+    @Override
+    public Response<IngredientDto> deleteIngredient(Long ingredientId) {
+        Optional<Ingredient> optional = ingredientRepository.findById(ingredientId);
+        if(!optional.isPresent())
+            return getResponseNotFound();
+
+        Ingredient delete = optional.get();
+        ingredientRepository.delete(delete);
+
+        return getResponseIsNotContent();
+    }
+
     private Response<IngredientDto> getResponseSuccess(Ingredient ingredient){
         Meta meta = new Meta(
             UUID.randomUUID(), 
@@ -84,6 +96,20 @@ public class IngredientServiceImpl implements IngredientService{
             UUID.randomUUID(), 
             HttpStatus.CREATED, 
             HttpStatusCode.valueOf(HttpStatus.CREATED.value()),
+            new Date()
+        );
+        IngredientDto ingredientDto = null;
+        Response<IngredientDto> response = new Response<IngredientDto>(
+            ingredientDto, 
+            meta);
+        return response;
+    }
+
+    private Response<IngredientDto> getResponseIsNotContent(){
+        Meta meta = new Meta(
+            UUID.randomUUID(), 
+            HttpStatus.NO_CONTENT, 
+            HttpStatusCode.valueOf(HttpStatus.NO_CONTENT.value()),
             new Date()
         );
         IngredientDto ingredientDto = null;
@@ -119,6 +145,5 @@ public class IngredientServiceImpl implements IngredientService{
             null, 
             meta);
         return response;
-    }
-    
+    }    
 }

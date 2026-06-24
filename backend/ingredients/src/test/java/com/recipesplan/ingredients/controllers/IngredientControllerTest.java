@@ -26,6 +26,7 @@ import com.recipesplan.ingredients.services.IngredientService;
 
 import tools.jackson.databind.ObjectMapper;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -95,6 +96,18 @@ public class IngredientControllerTest {
             .contentType(MediaType.APPLICATION_JSON)
             .content(input)
         ).andExpect(status().isOk());
+    }
+
+    @Test
+    public void shouldDeleteIngredient_WhenIdItsGiven() throws Exception{
+        Ingredient ingredient = getIngredient();
+        Response<IngredientDto> response = getResponseSuccess(ingredient);
+
+        when(ingredientService.deleteIngredient(ingredient.getId())).thenReturn(response);
+
+        mockMvc.perform(delete("/api/ingredient/v1/{ingredientId}", ingredient.getId())
+            .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(status().isNoContent());
     }
 
     private Ingredient getIngredient(){
