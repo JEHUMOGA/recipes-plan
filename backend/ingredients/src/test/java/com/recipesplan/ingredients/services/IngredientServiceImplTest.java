@@ -1,6 +1,9 @@
 package com.recipesplan.ingredients.services;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.Date;
@@ -81,6 +84,18 @@ public class IngredientServiceImplTest {
 
         assertTrue(response.getData().name().equalsIgnoreCase(ingredient2.getName()));
 
+    }
+
+    @Test
+    public void shouldDeleteIngredient_WhenIdItsGiven(){
+        Ingredient ingredient = getIngredient();
+        when(ingredientRepository.findById(ingredient.getId())).thenReturn(Optional.of(ingredient));
+        doNothing().when(ingredientRepository).delete(ingredient);
+
+        ingredientServiceImpl.deleteIngredient(ingredient.getId());
+
+        verify(ingredientRepository, times(1)).findById(ingredient.getId());
+        verify(ingredientRepository, times(1)).delete(ingredient);
     }
 
     private Ingredient getIngredient(){
