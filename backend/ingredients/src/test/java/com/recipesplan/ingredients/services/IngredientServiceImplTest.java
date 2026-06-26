@@ -1,11 +1,14 @@
 package com.recipesplan.ingredients.services;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -63,6 +66,16 @@ public class IngredientServiceImplTest {
     }
 
     @Test
+    public void shouldReturnNotFound_WhenDoesntFoundIngredient(){
+        when(ingredientRepository.findById(anyLong())).thenReturn(Optional.empty());
+
+        Response<IngredientDto> response = ingredientServiceImpl.getIngredient(1L);
+
+        assertTrue(response.getMeta().getStatus() == HttpStatus.NOT_FOUND);
+        
+    }
+
+    @Test
     public void shouldSaveIngredient_WhenItsGiven(){
         Ingredient ingredient = getIngredient();
         when(ingredientRepository.save(ingredient)).thenReturn(ingredient);
@@ -70,6 +83,13 @@ public class IngredientServiceImplTest {
         Response<IngredientDto> response = ingredientServiceImpl.postIngredient(IngredientMapper.toDto(ingredient));
 
         assertTrue(response.getMeta().getStatusCode().value() == HttpStatus.CREATED.value());
+    }
+
+    @Test
+    public void shouldReturnBadRequest_WhenIngredientProviderIsNull(){
+        Response<IngredientDto> response = ingredientServiceImpl.postIngredient(null);
+
+        assertTrue(response.getMeta().getStatus() == HttpStatus.BAD_REQUEST);
     }
 
     @Test
@@ -87,6 +107,14 @@ public class IngredientServiceImplTest {
     }
 
     @Test
+    public void shouldReturnNotFound_WhenUpdateNotFoundIngredient(){
+        when(ingredientRepository.findById(anyLong())).thenReturn(Optional.empty());
+        Response<IngredientDto> response = ingredientServiceImpl.updateIngredient(1L, any());
+
+        assertTrue(response.getMeta().getStatus() == HttpStatus.NOT_FOUND);
+    }
+
+    @Test
     public void shouldDeleteIngredient_WhenIdItsGiven(){
         Ingredient ingredient = getIngredient();
         when(ingredientRepository.findById(ingredient.getId())).thenReturn(Optional.of(ingredient));
@@ -96,6 +124,14 @@ public class IngredientServiceImplTest {
 
         verify(ingredientRepository, times(1)).findById(ingredient.getId());
         verify(ingredientRepository, times(1)).delete(ingredient);
+    }
+
+    @Test
+    public void DontDelete_WhenUpdateNotFoundIngredient(){
+        when(ingredientRepository.findById(anyLong())).thenReturn(Optional.empty());
+        Response<IngredientDto> response = ingredientServiceImpl.deleteIngredient(1L);
+
+        assertTrue(response.getMeta().getStatus() == HttpStatus.NOT_FOUND);
     }
 
     private Ingredient getIngredient(){
